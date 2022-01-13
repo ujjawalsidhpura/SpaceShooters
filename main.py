@@ -1,4 +1,5 @@
 from ctypes.wintypes import RGB
+from curses import window
 import pygame
 import os
 import random
@@ -38,7 +39,10 @@ class Ship:
         self.lasers = []
         self.cool_down_counter = 0
 
-# Make sure game runs at same speed on all PC
+    def draw(self, window):
+        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
+
+        # Make sure game runs at same speed on all PC
 
 
 def main():
@@ -47,8 +51,11 @@ def main():
     level = 1
     lives = 3
     main_font = pygame.font.SysFont('arial', 50)
+    player_velocity = 5
 
     clock = pygame.time.Clock()
+
+    ship = Ship(450, 800)
 
     def redraw_window():
         WIN.blit(BG, (0, 0))
@@ -58,6 +65,7 @@ def main():
 
         WIN.blit(lives_label, (10, 10))
         WIN.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
+        ship.draw(WIN)
         pygame.display.update()
 
     while run:
@@ -67,6 +75,16 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            ship.x -= player_velocity
+        if keys[pygame.K_RIGHT]:
+            ship.x += player_velocity
+        if keys[pygame.K_UP]:
+            ship.y -= player_velocity
+        if keys[pygame.K_DOWN]:
+            ship.y += player_velocity
 
 
 main()
