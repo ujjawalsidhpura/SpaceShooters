@@ -40,9 +40,16 @@ class Ship:
         self.cool_down_counter = 0
 
     def draw(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
+        window.blit(self.ship_img, (self.x, self.y))
 
-        # Make sure game runs at same speed on all PC
+
+class Player(Ship):
+    def __init__(self, x, y, health=100):
+        super().__init__(x, y, health):
+        self.ship_img = YELLOW_SPACE_SHIP
+        self.laser_img = YELLOW_LASER
+        self.max_health = health
+        self.mask = pygame.mask.from_surface(self.ship_img)
 
 
 def main():
@@ -77,13 +84,13 @@ def main():
                 run = False
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] and ship.x - player_velocity > 0:
             ship.x -= player_velocity
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and ship.x + player_velocity + 50 < WIDTH:
             ship.x += player_velocity
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] and ship.y - player_velocity > 0:
             ship.y -= player_velocity
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] and ship.y + player_velocity + 50 < HEIGHT:
             ship.y += player_velocity
 
 
