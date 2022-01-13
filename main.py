@@ -245,4 +245,22 @@ def main():
         player.move_lasers(-laser_velocity, enemies)
 
 
-main()
+def menu():
+    title = pygame.font.SysFont('arial', 70)
+    run = True
+
+    while run:
+        WIN.blit(BG, (0, 0))
+        label = title.render('Press mouse to start..', 1, (255, 255, 255))
+        WIN.blit(label, (WIDTH / 2 - label.get_width()/2, 450))
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                main()
+    pygame.quit()
+
+
+menu()
