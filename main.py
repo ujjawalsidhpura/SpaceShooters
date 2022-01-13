@@ -1,6 +1,7 @@
 from ctypes.wintypes import RGB
 from curses import window
 from re import S
+from turtle import onclick
 import pygame
 import os
 import random
@@ -64,6 +65,18 @@ class Ship:
 
     def draw(self, window):
         window.blit(self.ship_img, (self.x, self.y))
+        for laser in self.lasers:
+            laser.draw(window)
+
+    def move_lasers(self, velocity, object):
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(velocity)
+            if laser.off_screen(HEIGHT):
+                self.lasers.remove(laser)
+            elif laser.collision(object):
+                object.health -= 10
+                self.lasers.remove(laser)
 
     def cooldown(self):
         if self.cool_down_counter >= self.COOLDOWN:
@@ -91,6 +104,18 @@ class Player(Ship):
         self.laser_img = YELLOW_LASER
         self.max_health = health
         self.mask = pygame.mask.from_surface(self.ship_img)
+
+    def move_lasers(self, velocity, objects):
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(velocity)
+            if laser.off_screen(HEIGHT):
+                self.lasers.remove(laser)
+            else:
+                for object in objects:
+                    if laser.collision(object):
+                        objects.remove(object)
+                        self.lasers.remove(laser)
 
 
 class Enemy(Ship):
@@ -188,6 +213,8 @@ def main():
             player.y -= player_velocity
         if keys[pygame.K_DOWN] and player.y + player_velocity + player.get_height() < HEIGHT:
             player.y += player_velocity
+        if keys[pygame.K_SPACE]:
+            player.shoot()
 
         for enemy in enemies:
             enemy.move(enemy_velocity)
