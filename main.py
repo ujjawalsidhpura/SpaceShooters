@@ -102,10 +102,18 @@ def main():
 
         for enemy in enemies:
             enemy.draw(WIN)
+
+        if lost:
+            lost_label = main_font.render('You Lost!', 1, (255, 255, 255))
+            WIN.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2), 450)
+
         pygame.display.update()
 
     while run:
         clock.tick(FPS)
+
+        if lives <= 0 or player.health < 0:
+            lost = True
 
         if len(enemies) == 0:
             level += 1
@@ -131,6 +139,9 @@ def main():
 
         for enemy in enemies:
             enemy.move(enemy_velocity)
+            if enemy.y + enemy.get_height() > HEIGHT:
+                lives -= 1
+                enemies.remove(enemy)
 
         redraw_window()
 
