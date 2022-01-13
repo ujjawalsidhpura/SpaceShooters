@@ -1,5 +1,6 @@
 from ctypes.wintypes import RGB
 from curses import window
+from re import S
 import pygame
 import os
 import random
@@ -27,6 +28,26 @@ YELLOW_LASER = pygame.image.load('assets/pixel_laser_yellow.png')
 # Background
 BG = pygame.transform.scale(pygame.image.load(
     'assets/background-black.png'), (WIDTH, HEIGHT))
+
+
+class Laser:
+    def __init__(self, x, y, img):
+        self.x = x
+        self.y = y
+        self.img = img
+        self.mask = pygame.mask.from_surface(img)
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    def move(self, velocity):
+        self.y += velocity
+
+    def off_screen(self, height):
+        return self.y <= height and self.y >= 0
+
+    def collision(self, object):
+        return collide(object, self)
 
 
 class Ship:
@@ -74,6 +95,12 @@ class Enemy(Ship):
         self.y += velocity
 
 
+def collide(obj1, obj2):
+    offset_x = obj2.x - obj1.x
+    offset_y = obj2.y - obj1.y
+    return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None
+
+
 def main():
     run = True
     FPS = 60
@@ -85,6 +112,9 @@ def main():
     enemies = []
     enemy_velocity = 1
     wave_length = 5
+
+    lost = False
+    lost_count = 0
 
     clock = pygame.time.Clock()
 
@@ -111,9 +141,17 @@ def main():
 
     while run:
         clock.tick(FPS)
+        redraw_window()
 
         if lives <= 0 or player.health < 0:
             lost = True
+            lost_count += 1
+
+        if lost:
+            if lost_count > FPS * 5:
+                run = False
+            else:
+                continue
 
         if len(enemies) == 0:
             level += 1
@@ -142,8 +180,6 @@ def main():
             if enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
-
-        redraw_window()
 
 
 main()
