@@ -45,7 +45,7 @@ class Laser:
         self.y += velocity
 
     def off_screen(self, height):
-        return self.y <= height and self.y >= 0
+        return not (self.y <= height and self.y >= 0)
 
     def collision(self, object):
         return collide(object, self)
@@ -146,7 +146,9 @@ def main():
     level = 1
     lives = 3
     main_font = pygame.font.SysFont('arial', 50)
+
     player_velocity = 5
+    laser_velocity = 6
 
     enemies = []
     enemy_velocity = 1
@@ -218,9 +220,12 @@ def main():
 
         for enemy in enemies:
             enemy.move(enemy_velocity)
+            enemy.move_lasers(laser_velocity, player)
             if enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
+
+        player.move_lasers(-laser_velocity, enemies)
 
 
 main()
