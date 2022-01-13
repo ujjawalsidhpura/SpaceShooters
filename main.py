@@ -51,6 +51,8 @@ class Laser:
 
 
 class Ship:
+    COOLDOWN = 30  # Half of FPS (Main)
+
     def __init__(self, x, y, health=100):
         self.x = x
         self.y = y
@@ -63,10 +65,17 @@ class Ship:
     def draw(self, window):
         window.blit(self.ship_img, (self.x, self.y))
 
+    def cooldown(self):
+        if self.cool_down_counter >= self.COOLDOWN:
+            self.cool_down_counter = 0
+        elif self.cool_down_counter > 0:
+            self.cool_down_counter += 1
+
     def shoot(self):
         if self.cool_down_counter == 0:
             laser = Laser(self.x, self.y, self.laser_img)
             self.lasers.append(laser)
+            self.cool_down_counter = 1
 
     def get_width(self):
         return self.ship_img.get_width()
